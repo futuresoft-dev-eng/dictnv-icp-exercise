@@ -1,4 +1,3 @@
-import UserRegisterValidator from 'App/Validators/UserRegisterValidator';
 import UserUpdateValidator from 'App/Validators/UserUpdateValidator';
 import { User } from 'Database/entities/user';
 import { ic } from 'azle';
@@ -33,19 +32,7 @@ export default class UsersController {
   }
 
   static async register(request: Request, response: Response) {
-    const { data, success, error } = UserRegisterValidator.validate(request.body);
-
-    if (!success) {
-      response.status(400);
-      const { path, message } = error.issues?.[0];
-
-      return response.json({
-        status: 0,
-        message: `${path?.join('.')}: ${message}`,
-      });
-    }
-
-    const { email, username, name } = data;
+    const { email, username, name } = request.body;
 
     const userData: Partial<User> = {
       email,
@@ -86,18 +73,7 @@ export default class UsersController {
   }
 
   static async update(request: Request, response: Response) {
-    const { data, success, error } = UserUpdateValidator.validate(request.body);
-
-    if (!success) {
-      response.status(400);
-      const { path, message } = error.issues?.[0];
-      return response.json({
-        status: 0,
-        message: `${path?.join('.')}: ${message}`,
-      });
-    }
-
-    const { name, tiktok, instagram, facebook, twitter, website, bio, profile_photo, banner_photo } = data;
+    const { name, tiktok, instagram, facebook, twitter, website, bio, profile_photo, banner_photo } = request.body();
 
     try {
       const findUser = await User.findOneBy({ principal_id: ic.caller().toText() });
